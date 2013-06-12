@@ -105,7 +105,7 @@ class Player(object):
     PLAYER who can interact with a BOARD within the context of a GAME.
     """
 
-    def __init__(self, name, total_games_played = 0, total_games_won = 0, total_winnings = 0):
+    def __init__(self, name, total_games_played=0, total_games_won=0, total_winnings=0):
         self.name = name
         self.total_games_played = total_games_played
         self.total_games_won = total_games_won
