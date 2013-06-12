@@ -9,6 +9,7 @@ class Wheel(object):
     @classmethod
     def spin(cls):
         """
+        Returns the value of the spin as an int
         Input:               nothing besides the CLS
         Output:              an INT representing the value of the spin
         Changes to state:    N/A
@@ -53,15 +54,8 @@ class Board(object):
         self.current_phrase = self.mask_phrase()
         self.all_guesses = set()
 
-    def get_correct_phrase(self):
-        return self.correct_phrase
-    def get_current_phrase(self):
-        return self.current_phrase
-    def get_all_guesses(self):
-        return self.all_guesses
-
     def __str__(self):
-        s = """Here is what the board looks like so far: %s\nHere are all the guesses so far: %s""" % (self.get_current_phrase(), str(self.get_all_guesses()))
+        s = """Here is what the board looks like so far: %s\nHere are all the guesses so far: %s""" % (self.current_phrase, str(self.all_guesses))
         return s
 
     def mask_phrase(self):
@@ -130,10 +124,6 @@ class Board(object):
             return (num_found, game_over)
 
     @classmethod
-    def get_phrases(cls):
-        return cls.phrases
-
-    @classmethod
     def add_phrase(cls, phrase):
         """
         Input:                 a STRING phrase which can be in any case
@@ -167,61 +157,29 @@ class Player(object):
         return "My name is %s. I have guessed %s total times and got %s guesses correctly in the %s games I played. My win-loss record is: %s Wins and %s Losses. My total winnings is %s." \
         % (self.name, self.total_num_guesses, self.total_num_correct_guesses, self.total_games_played, self.total_games_won, self.total_games_played - self.total_games_won, self.total_winnings)
 
-    def get_name(self):
-        return self.name
-    def set_name(self, name):
-        self.name = name
-        return self.name
-
-    def get_total_games_played(self):
-        return self.total_games_played
-    def inc_total_games_played(self):
-        self.total_games_played += 1
-        return self.total_games_played
-
-    def get_total_games_won(self):
-        return self.total_games_won
-    def inc_total_games_won(self):
-        self.total_games_won += 1
-        return self.total_games_won
-
-    def get_total_winnings(self):
-        return self.total_winnings
-    def update_total_winnings(self, incremental_winnings):
-        self.total_winnings += incremental_winnings
-        return self.total_winnings
-
-    def get_current_game(self):
-        return self.current_game
-    def get_current_game_score(self):
+    @property
+    def current_game_score(self):
         return self.current_game["score"]
-    def update_current_game_score(self, new_inc_score):
-        self.current_game["score"] += new_inc_score
-        return self.current_game["score"]
+    @current_game_score.setter
+    def current_game_score(self, new_score):
+        self.current_game["score"] = new_score
 
-    def get_current_game_num_guesses(self):
-        return self.current_game["num_guesses"]
-    def inc_current_game_num_guesses(self):
-        self.current_game["num_guesses"] += 1
-        return self.current_game["num_guesses"]
+    current_game_num_guesses = property(
+            lambda self: self.current_game["num_guesses"],
+            lambda self, value: self.current_game.__setitem__("num_guesses", value))
 
-    def get_current_game_num_correct_guesses(self):
-        return self.current_game["num_correct_guesses"]
-    def inc_current_game_num_correct_guesses(self):
-        self.current_game["num_correct_guesses"] += 1
-        return self.current_game["num_correct_guesses"]
+    def make_proxy_for_current_game(att):
+        def getter(self):
+            return self.current_game[att]
+        def setter(self, value):
+            self.current_game[att] = value
+        return property(getter, setter)
 
-    def get_total_num_guesses(self):
-        return self.total_num_guesses
-    def update_total_num_guesses(self, new_inc_guesses):
-        self.total_num_guesses += new_inc_guesses
-        return self.total_num_guesses
+    for att in ['num_correct_guesses']:
+        prop = make_proxy_for_current_game(att)
+        locals().update({'current_game_' + att: prop})
 
-    def get_total_num_correct_guesses(self):
-        return self.total_num_correct_guesses
-    def update_total_num_correct_guesses(self, new_inc_correct_guesses):
-        self.total_num_correct_guesses += new_inc_correct_guesses
-        return self.total_num_correct_guesses
+    del make_proxy_for_current_game
 
 
 class Game(object):
@@ -242,31 +200,16 @@ class Game(object):
 
         print "This is the order of the game: "
         for j in self.players:
-            print j.get_name()
+            print j.name
         self.current_player = self.players[0]
         self.is_game_over = False
         self.start_game()
 
     def __str__(self):
-        s = """Here's a description of a game so far:\n** Game **\nThere are %s players. We are on turn %s, and here's a description of the current player:\n%s\n\n** Players **\n%s\n\n** Board **\n%s""" % (self.get_num_players(), self.get_num_turns(), self.get_current_player(), self.get_players(), self.get_board())
+        s = """Here's a description of a game so far:\n** Game **\nThere are %s players. We are on turn %s, and here's a description of the current player:\n%s\n\n** Players **\n%s\n\n** Board **\n%s""" % (self.num_players, self.num_turns, self.current_player, self.players, self.board)
         return s
 
-    def get_num_turns(self):
-        return self.num_turns
-    def get_num_players(self):
-        return self.num_players
-    def get_players(self):
-        return self.players
-    def get_board(self):
-        return self.board
-    def get_is_game_over(self):
-        return self.is_game_over
-    def set_is_game_over(self, state):
-        self.is_game_over = state
-        return self.is_game_over
-    def get_current_player(self):
-        return self.current_player
-    def get_next_player(self):
+    def advance_player(self):
         """
         Input:                nothing besides SELF
         Output:                a PLAYER representing the next player in the established order
@@ -311,68 +254,68 @@ class Game(object):
         # Initially, the game will not be over
         while not self.is_game_over:
             # Current player makes a guess, which means I need to update the current game's num_guesses
-            print self.get_board()
+            print self.board
 
             score = 0
             spin = Wheel.spin()
 
-            print self.get_current_player().get_name() + ", it's your turn and here's your current score: %s" % self.get_current_player().get_current_game_score()
+            print self.current_player.name + ", it's your turn and here's your current score: %s" % self.current_player.current_game_score
             raw_input("Press enter to see what you spin!")
             print "You rolled a %s." % spin
 
             if spin == 0:
                 # Increment number of guesses; don't update score; get next player
                 print "Sorry, rolling a %s means it's the next player's turn." % spin
-                self.get_current_player().inc_current_game_num_guesses()
-                # print self.get_current_player()
-                self.get_next_player()
-                # print self.get_current_player()
+                self.current_player.current_game_num_guesses += 1
+                # print self.current_player()
+                self.advance_player()
+                # print self.current_player()
                 # self.is_game_over = True
             else:
                 # You successfully spun the wheel
                 player_guess = self.prompt_guess()
                 # Submit guess to board
-                (num_found, game_over) = self.get_board().is_guess_correct(player_guess)
+                (num_found, game_over) = self.board.is_guess_correct(player_guess)
                 # Scenario 1
                 if num_found == -1:
                     # Don't update number of guesses
                     continue
                 # Scenario 2
                 elif num_found > 0 and not game_over:
-                    self.get_current_player().inc_current_game_num_guesses()
-                    self.get_current_player().inc_current_game_num_correct_guesses()
+                    self.current_player.current_game_num_guesses += 1
+                    self.current_player.current_game_num_correct_guesses += 1
                     score = num_found * spin
-                    self.get_current_player().update_current_game_score(score)
-                    print self.get_current_player().get_name() + ", you guessed the letter %s and there are %s on the board! Since you guessed correctly, it's your turn again!" % (player_guess, num_found)
+                    self.current_player.current_game_score += score
+                    print self.current_player.name + ", you guessed the letter %s and there are %s on the board! Since you guessed correctly, it's your turn again!" % (player_guess, num_found)
                 # Scenario 3
                 elif num_found > 0 and game_over:
-                    self.get_current_player().inc_current_game_num_guesses()
-                    self.get_current_player().inc_current_game_num_correct_guesses()
+                    self.current_player.inc_current_game_num_guesses()
+                    self.current_player.current_game_num_correct_guesses += 1
                     score = num_found * spin
-                    self.get_current_player().update_current_game_score(score)
-                    self.set_is_game_over(game_over)
-                    print self.get_current_player().get_name() + ", you guessed the letter %s and there are %s on the board! Since you guessed the last letter on the board, you just won!" % (player_guess, num_found)
+                    self.current_player.current_game_score += score
+                    self.is_game_over = game_over
+                    print self.current_player.name + ", you guessed the letter %s and there are %s on the board! Since you guessed the last letter on the board, you just won!" % (player_guess, num_found)
                 # Scenario 6
                 elif num_found == 0 and game_over:
-                    self.get_current_player().inc_current_game_num_guesses()
-                    self.get_current_player().inc_current_game_num_correct_guesses()
-                    self.set_is_game_over(game_over)
-                    print self.get_current_player().get_name() + ", you just solved the board with the guess %s! Congrats!" % player_guess
+                    self.current_player.current_game_num_guesses += 1
+                    self.current_player.current_game_num_correct_guesses += 1
+                    self.is_game_over = game_over
+                    print self.current_player.name + ", you just solved the board with the guess %s! Congrats!" % player_guess
                 # Scenario 4 or 5
                 else:
-                    self.get_current_player().inc_current_game_num_guesses()
-                    print self.get_current_player().get_name() + ", sorry but your guess wasn't correct.  It's the next player's turn now!"
-                    self.get_next_player()
+                    self.current_player.current_game_num_guesses += 1
+                    print self.current_player.name + ", sorry but your guess wasn't correct.  It's the next player's turn now!"
+                    self.advance_player()
         # The game is now over.  Need to update game scores for all players.
-        print "The game took %s turns." % self.get_num_turns() + 1
-        for p in self.get_players():
+        print "The game took %s turns." % self.num_turns() + 1
+        for p in self.players:
             p.inc_total_games_played()
-            p.update_total_num_guesses(p.get_current_game_num_guesses())
-            p.update_total_num_correct_guesses(p.get_current_game_num_correct_guesses())
+            p.total_num_guesses += p.current_game_num_guesses
+            p.total_num_correct_guesses += p.current_game_num_correct_guesses
             # The game ends with the current player being the winner
-            if p == self.get_current_player():
+            if p == self.current_player:
                 p.inc_total_games_won()
-                p.update_total_winnings(p.get_current_game_score())
+                p.total_winnings += p.current_game_score
             print p
 # TESTS
 
@@ -381,16 +324,16 @@ class Game(object):
 # print "PLAYER RELATED"
 # print "----------------------"
 # p1 = Player("Willson")
-# # print p1.get_name()
-# # print p1.get_total_games_played()
-# # print p1.get_total_games_won()
-# # print p1.get_total_winnings()
+# # print p1.name
+# # print p1.total_games_played
+# # print p1.total_games_won
+# # print p1.total_winnings
 # print p1
 # # 2) Update player name
-# # print p1.set_name("Mock")
+# # print p1.name = "Mock"
 # # 3) Assume player won and get 500 incremental_winnings
 # # print p1.update_total_winnings(500)
-# # print p1.get_total_winnings()
+# # print p1.total_winnings
 # # 4) Print updated player
 # # print p1
 # # 5) Create 2 more players
@@ -406,11 +349,11 @@ class Game(object):
 # print "BOARD RELATED"
 # print "----------------------"
 # board = Board()
-# print "Initial setup.  The correct phrase is: ", board.get_correct_phrase()
+# print "Initial setup.  The correct phrase is: ", board.correct_phrase
 # print "Initial setup. ", board
 # # 2) Get phrases as a class method
 # print "----------------------"
-# print "Initial setup.  List of all the phrases: ", Board.get_phrases()
+# print "Initial setup.  List of all the phrases: ", Board.phrases
 # # 3) Add a phrase that exists already
 # print "----------------------"
 # print "Adding a phrase that already exists."
@@ -478,17 +421,17 @@ print "----------------------"
 # 1) Create a game and print out the board and players
 game = Game(2)
 # print game
-# print "Is game over? ", game.get_is_game_over()
+# print "Is game over? ", game.is_game_over
 # game.start_game()
 # print "This is the game board: "
-# print game.get_board()
-# for p in game.get_players():
+# print game.board
+# for p in game.players:
 #     print p
 # # 2) Call other get functions
 # print "----------------------"
-# print "Number of turns so far: %s" % game.get_num_turns()
-# print "Number of players: %s" % game.get_num_players()
-# print "Current player is: %s" % game.get_current_player()
+# print "Number of turns so far: %s" % game.num_turns
+# print "Number of players: %s" % game.num_players
+# print "Current player is: %s" % game.current_player
 
 # for i in range(0, 20):
-#     print game.get_next_player()
+#     print game.advance_player
