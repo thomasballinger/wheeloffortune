@@ -176,7 +176,6 @@ class Game(object):
             print j.name
         self.current_player = self.players[0]
         self.is_game_over = False
-        self.start_game()
 
     def __str__(self):
         s = ("Here's a description of a game so far:\n** Game **\nThere are %s players."
@@ -295,3 +294,4 @@ if __name__ == '__main__':
     print "WELCOME TO WHEEL OF FORTUNE!"
     print "----------------------"
     game = Game(2)
+    game.start_game()
