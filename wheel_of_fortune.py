@@ -33,8 +33,6 @@ class Board(object):
     def masked_phrase(self):
         """
         Returns a STRING masked_phrase with the same length as self.correct_phrase but with all alphabetic characters converted to *
-
-        Note: This method is only used when a BOARD object is initially set up.
         """
         return "".join(c if (c in self.all_guesses or not c.isalpha()) else '*'
                        for c in self.correct_phrase)
@@ -126,11 +124,10 @@ class Player(object):
                     self.total_num_correct_guesses,self.total_games_played, self.total_games_won,
                     self.total_games_played - self.total_games_won, self.total_winnings))
 
-    for att in ['num_correct_guesses', 'score', 'num_guesses']:
-        prop = (lambda att: property(
-                    lambda self: self.current_game[att],
-                    lambda self, value: setattr(self.current_game, att, value)))(att)
-        locals().update({'current_game_' + att: prop})
+    locals().update({'current_game_' + att : (lambda att: property(
+                        lambda self: self.current_game[att],
+                        lambda self, value: self.current_game.__setitem__(att, value)))(att)
+                    for att in ['num_correct_guesses', 'score', 'num_guesses']})
 
 
 class Game(object):
@@ -145,7 +142,6 @@ class Game(object):
         print "This is the order of the game: "
         for j in self.players:
             print j.name
-        self.current_player = self.players[0]
         self.is_game_over = False
 
     def __str__(self):
@@ -155,15 +151,17 @@ class Game(object):
              (self.num_players, self.num_turns, self.current_player, self.players, self.board))
         return s
 
-    def advance_player(self):
+    def end_turn(self):
         """
         Advance the player and inrement self.num_turns
 
         Note:  This method should only be called when Scenario 4 or 5 occurs.
         """
         self.num_turns += 1
-        self.current_player = self.players[self.num_turns % self.num_players]
-        return self.current_player
+
+    @property
+    def current_player(self):
+        return self.players[self.num_turns % self.num_players]
 
     def prompt_guess(self):
         guess = raw_input("Please enter a guess: ")
@@ -210,7 +208,7 @@ class Game(object):
                 print "Sorry, rolling a %s means it's the next player's turn." % spin
                 self.current_player.current_game_num_guesses += 1
                 # print self.current_player()
-                self.advance_player()
+                self.end_turn()
                 # print self.current_player()
                 # self.is_game_over = True
             else:
@@ -247,7 +245,7 @@ class Game(object):
                 else:
                     self.current_player.current_game_num_guesses += 1
                     print self.current_player.name + ", sorry but your guess wasn't correct.  It's the next player's turn now!"
-                    self.advance_player()
+                    self.end_turn()
         # The game is now over.  Need to update game scores for all players.
         print "The game took %s turns." % self.num_turns() + 1
         for p in self.players:
