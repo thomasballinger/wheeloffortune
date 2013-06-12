@@ -52,7 +52,7 @@ class Board(object):
         6) You make a valid multiple letter guess (solve), and you solved correctly.  Return (0, True)
         """
 
-        def guess_is_valid(guess): return len(guess) == 0 or guess in self.all_guesses
+        def guess_invalid(guess): return len(guess) == 0 or guess in self.all_guesses
 
         def single_letter_guess(char):
             initial_unguessed = self.masked_phrase.count('*')
@@ -77,7 +77,7 @@ class Board(object):
 
         u_guess = guess.upper()
 
-        if not guess_is_valid(u_guess):
+        if guess_invalid(u_guess):
             print "Please guess again. You didn't provide a guess or your guess has already been made."
             return (-1, False)
         if len(u_guess) == 1:
@@ -177,6 +177,49 @@ class Game(object):
         #     return guess
         return guess
 
+    def player_guess(self):
+        """Ask player for a guess, modify Board state to reflect guess"""
+        print self.board
+
+        print self.current_player.name + ", it's your turn and here's your current score: %s" % self.current_player.current_game_score
+        raw_input("Press enter to see what you spin!")
+        spin = spin_wheel()
+        print "You rolled a %s." % spin
+
+        if spin == 0:
+            # Increment number of guesses; don't update score; get next player
+            print "Sorry, rolling a %s means it's the next player's turn." % spin
+            self.end_turn()
+            self.current_player.current_game_num_guesses += 1
+        else:
+            # You successfully spun the wheel
+            player_guess = self.prompt_guess()
+            # Submit guess to board
+            (num_found, self.game_over) = self.board.guess(player_guess)
+            # Scenario 1
+            if num_found == -1:
+                # Don't update number of guesses
+                return
+            self.current_player.current_game_num_guesses += 1
+            if num_found > 0:
+                self.current_player.current_game_num_correct_guesses += 1
+                score = num_found * spin
+                self.current_player.current_game_score += score
+                if self.game_over:
+                    # Scenario 3
+                    print self.current_player.name + ", you guessed the letter %s and there are %s on the board! Since you guessed the last letter on the board, you just won!" % (player_guess, num_found)
+                else:
+                    # Scenario 2
+                    print self.current_player.name + ", you guessed the letter %s and there are %s on the board! Since you guessed correctly, it's your turn again!" % (player_guess, num_found)
+            # Scenario 6
+            elif self.game_over:
+                self.current_player.current_game_num_correct_guesses += 1
+                print self.current_player.name + ", you just solved the board with the guess %s! Congrats!" % player_guess
+            # Scenario 4 or 5
+            else:
+                print self.current_player.name + ", sorry but your guess wasn't correct.  It's the next player's turn now!"
+                self.end_turn()
+
     def start_game(self):
         """
         Changes to state:   GAME (num_turns, board, players, current_player, is_game_over)
@@ -196,59 +239,7 @@ class Game(object):
         """
         # Initially, the game will not be over
         while not self.is_game_over:
-            # Current player makes a guess, which means I need to update the current game's num_guesses
-            print self.board
-
-            score = 0
-
-            print self.current_player.name + ", it's your turn and here's your current score: %s" % self.current_player.current_game_score
-            raw_input("Press enter to see what you spin!")
-            spin = spin_wheel()
-            print "You rolled a %s." % spin
-
-            if spin == 0:
-                # Increment number of guesses; don't update score; get next player
-                print "Sorry, rolling a %s means it's the next player's turn." % spin
-                self.current_player.current_game_num_guesses += 1
-                # print self.current_player()
-                self.end_turn()
-                # print self.current_player()
-                # self.is_game_over = True
-            else:
-                # You successfully spun the wheel
-                player_guess = self.prompt_guess()
-                # Submit guess to board
-                (num_found, game_over) = self.board.guess(player_guess)
-                # Scenario 1
-                if num_found == -1:
-                    # Don't update number of guesses
-                    continue
-                # Scenario 2
-                elif num_found > 0 and not game_over:
-                    self.current_player.current_game_num_guesses += 1
-                    self.current_player.current_game_num_correct_guesses += 1
-                    score = num_found * spin
-                    self.current_player.current_game_score += score
-                    print self.current_player.name + ", you guessed the letter %s and there are %s on the board! Since you guessed correctly, it's your turn again!" % (player_guess, num_found)
-                # Scenario 3
-                elif num_found > 0 and game_over:
-                    self.current_player.inc_current_game_num_guesses()
-                    self.current_player.current_game_num_correct_guesses += 1
-                    score = num_found * spin
-                    self.current_player.current_game_score += score
-                    self.is_game_over = game_over
-                    print self.current_player.name + ", you guessed the letter %s and there are %s on the board! Since you guessed the last letter on the board, you just won!" % (player_guess, num_found)
-                # Scenario 6
-                elif num_found == 0 and game_over:
-                    self.current_player.current_game_num_guesses += 1
-                    self.current_player.current_game_num_correct_guesses += 1
-                    self.is_game_over = game_over
-                    print self.current_player.name + ", you just solved the board with the guess %s! Congrats!" % player_guess
-                # Scenario 4 or 5
-                else:
-                    self.current_player.current_game_num_guesses += 1
-                    print self.current_player.name + ", sorry but your guess wasn't correct.  It's the next player's turn now!"
-                    self.end_turn()
+            self.player_guess()
         # The game is now over.  Need to update game scores for all players.
         print "The game took %s turns." % self.num_turns() + 1
         for p in self.players:
