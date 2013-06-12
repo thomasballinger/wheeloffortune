@@ -1,30 +1,25 @@
 import random
 
-class Wheel(object):
+def spin_wheel():
     """
-    WHEEL which has different probabilities of returning different integer values.
-    The integer values represent the multiplier that's applied to a PLAYERs score,
+    Returns integer values representing the multiplier that's applied to a PLAYERs score,
     depending on the number of characters they guessed correctly.
     """
+    rand_num = random.randint(1, 100)
 
-    @classmethod
-    def spin(cls):
-        """Returns the value of the spin as an int"""
-        rand_num = random.randint(1, 100)
-
-        # generate distribution
-        if rand_num <= 25:
-            return 0 # Lose a turn
-        elif rand_num <= 75:
-            return 1
-        elif rand_num <= 88:
-            return 2
-        elif rand_num <= 94:
-            return 3
-        elif rand_num <= 99:
-            return 5
-        else:
-            return 8
+    # generate distribution
+    if rand_num <= 25:
+        return 0 # Lose a turn
+    elif rand_num <= 75:
+        return 1
+    elif rand_num <= 88:
+        return 2
+    elif rand_num <= 94:
+        return 3
+    elif rand_num <= 99:
+        return 5
+    else:
+        return 8
 
 
 class Board(object):
@@ -248,7 +243,7 @@ class Game(object):
             print self.board
 
             score = 0
-            spin = Wheel.spin()
+            spin = spin_wheel()
 
             print self.current_player.name + ", it's your turn and here's your current score: %s" % self.current_player.current_game_score
             raw_input("Press enter to see what you spin!")
