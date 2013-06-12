@@ -23,9 +23,9 @@ class Board(object):
 
     # UNCOMMENT BELOW WHEN IN PRODUCTION
 
-    phrases =     ['SOMETIMES THE HEART SEES WHAT IS INVISIBLE TO THE EYE.', \
-                'NEVER GRADUATE!', \
-                "IF YOU DON'T BUILD YOUR DREAM, SOMEONE ELSE WILL HIRE YOU TO HELP THEM BUILD THEIRS.", \
+    phrases =  ['SOMETIMES THE HEART SEES WHAT IS INVISIBLE TO THE EYE.',
+                'NEVER GRADUATE!',
+                "IF YOU DON'T BUILD YOUR DREAM, SOMEONE ELSE WILL HIRE YOU TO HELP THEM BUILD THEIRS.",
                 'DO NOT DWELL IN THE PAST, DO NOT DREAM OF THE FUTURE, CONCENTRATE THE MIND ON THE PRESENT MOMENT.']
 
     def __init__(self):
@@ -37,7 +37,8 @@ class Board(object):
         self.all_guesses = set()
 
     def __str__(self):
-        s = """Here is what the board looks like so far: %s\nHere are all the guesses so far: %s""" % (self.current_phrase, str(self.all_guesses))
+        s = ("""Here is what the board looks like so far: %s\nHere are all the guesses so far: %s"""
+                % (self.current_phrase, str(self.all_guesses)))
         return s
 
     def mask_phrase(self):
@@ -135,8 +136,11 @@ class Player(object):
         self.total_num_correct_guesses = self.current_game["num_correct_guesses"]
 
     def __str__(self):
-        return "My name is %s. I have guessed %s total times and got %s guesses correctly in the %s games I played. My win-loss record is: %s Wins and %s Losses. My total winnings is %s." \
-        % (self.name, self.total_num_guesses, self.total_num_correct_guesses, self.total_games_played, self.total_games_won, self.total_games_played - self.total_games_won, self.total_winnings)
+        return ("My name is %s. I have guessed %s total times and got %s guesses correctly"
+                "in the %s games I played. My win-loss record is: %s Wins and %s Losses."
+                "My total winnings is %s." % (self.name, self.total_num_guesses,
+                    self.total_num_correct_guesses,self.total_games_played, self.total_games_won,
+                    self.total_games_played - self.total_games_won, self.total_winnings))
 
     @property
     def current_game_score(self):
@@ -187,7 +191,10 @@ class Game(object):
         self.start_game()
 
     def __str__(self):
-        s = """Here's a description of a game so far:\n** Game **\nThere are %s players. We are on turn %s, and here's a description of the current player:\n%s\n\n** Players **\n%s\n\n** Board **\n%s""" % (self.num_players, self.num_turns, self.current_player, self.players, self.board)
+        s = ("Here's a description of a game so far:\n** Game **\nThere are %s players."
+             "We are on turn %s, and here's a description of the current player:\n%s\n\n**"
+             "Players **\n%s\n\n** Board **\n%s" %
+             (self.num_players, self.num_turns, self.current_player, self.players, self.board))
         return s
 
     def advance_player(self):
