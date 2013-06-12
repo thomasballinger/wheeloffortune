@@ -123,6 +123,12 @@ class Player(object):
         self.total_num_guesses = self.current_game["num_guesses"]
         self.total_num_correct_guesses = self.current_game["num_correct_guesses"]
 
+    @classmethod
+    def player_from_raw_input(cls):
+        p = cls(raw_input("Please enter your name: "))
+        print "Welcome to Wheel of Fortune, %s" % p.name
+        return p
+
     def __str__(self):
         return ("My name is %s. I have guessed %s total times and got %s guesses correctly"
                 "in the %s games I played. My win-loss record is: %s Wins and %s Losses."
@@ -156,20 +162,13 @@ class Player(object):
 
 
 class Game(object):
-    """
-    Each instance of GAME keeps track of the BOARD and all the PLAYERs involved in the GAME.
-    """
+    """ Each instance of GAME keeps track of the BOARD and all the PLAYERs involved in the GAME.  """
     def __init__(self, num_players):
         self.num_turns = 0
         self.num_players = num_players
-        self.players = []
-        self.board = Board()
-
-        for i in range(0, num_players):
-            name = raw_input("Please enter your name: ")
-            self.players.append(Player(name))
-            print "Welcome to Wheel of Fortune, %s" % name
+        self.players = [Player.player_from_raw_input() for _ in range(num_players)]
         random.shuffle(self.players)
+        self.board = Board()
 
         print "This is the order of the game: "
         for j in self.players:
