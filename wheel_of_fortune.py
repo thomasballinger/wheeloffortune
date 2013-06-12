@@ -26,7 +26,7 @@ class Board(object):
 
     def __str__(self):
         s = ("""Here is what the board looks like so far: %s\nHere are all the guesses so far: %s"""
-                % (self.masked_phrase, str(self.all_guesses)))
+                % (self.masked_phrase, ' '.join(self.all_guesses)))
         return s
 
     @property
