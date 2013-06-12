@@ -42,7 +42,7 @@ class Board(object):
 
         Note: This method is only used when a BOARD object is initially set up.
         """
-        return "".join('*' if c.isalpha() else '*' for c in self.correct_phrase)
+        return "".join('*' if c.isalpha() else c for c in self.correct_phrase)
 
     def is_guess_correct(self, guess):
         """
