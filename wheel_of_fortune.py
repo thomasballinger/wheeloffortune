@@ -5,22 +5,13 @@ def spin_wheel():
     Returns integer values representing the multiplier that's applied to a PLAYERs score,
     depending on the number of characters they guessed correctly.
     """
-    rand_num = random.randint(1, 100)
-
-    # generate distribution
-    if rand_num <= 25:
-        return 0 # Lose a turn
-    elif rand_num <= 75:
-        return 1
-    elif rand_num <= 88:
-        return 2
-    elif rand_num <= 94:
-        return 3
-    elif rand_num <= 99:
-        return 5
-    else:
-        return 8
-
+    choices = ([0] * 25 +
+               [1] * 50 +
+               [2] * 13 +
+               [3] * 6 +
+               [5] * 5 +
+               [8] * 1)
+    return random.choice(choices)
 
 class Board(object):
     """
