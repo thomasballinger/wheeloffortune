@@ -127,6 +127,7 @@ class Player(object):
                     self.total_num_correct_guesses,self.total_games_played, self.total_games_won,
                     self.total_games_played - self.total_games_won, self.total_winnings))
 
+    # not a good idea
     locals().update({'current_game_' + att : (lambda att: property(
                         lambda self: self.current_game[att],
                         lambda self, value: self.current_game.__setitem__(att, value)))(att)
@@ -243,12 +244,12 @@ class Game(object):
         # The game is now over.  Need to update game scores for all players.
         print "The game took %s turns." % self.num_turns() + 1
         for p in self.players:
-            p.inc_total_games_played()
+            p.total_games_played += 1
             p.total_num_guesses += p.current_game_num_guesses
             p.total_num_correct_guesses += p.current_game_num_correct_guesses
             # The game ends with the current player being the winner
             if p == self.current_player:
-                p.inc_total_games_won()
+                p.total_games_won += 1
                 p.total_winnings += p.current_game_score
             print p
 
