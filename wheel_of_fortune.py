@@ -136,17 +136,6 @@ class Player(object):
                     self.total_num_correct_guesses,self.total_games_played, self.total_games_won,
                     self.total_games_played - self.total_games_won, self.total_winnings))
 
-    @property
-    def current_game_score(self):
-        return self.current_game["score"]
-    @current_game_score.setter
-    def current_game_score(self, new_score):
-        self.current_game["score"] = new_score
-
-    current_game_num_guesses = property(
-            lambda self: self.current_game["num_guesses"],
-            lambda self, value: self.current_game.__setitem__("num_guesses", value))
-
     def make_proxy_for_current_game(att):
         def getter(self):
             return self.current_game[att]
@@ -154,7 +143,7 @@ class Player(object):
             self.current_game[att] = value
         return property(getter, setter)
 
-    for att in ['num_correct_guesses']:
+    for att in ['num_correct_guesses', 'score', 'num_guesses']:
         prop = make_proxy_for_current_game(att)
         locals().update({'current_game_' + att: prop})
 
