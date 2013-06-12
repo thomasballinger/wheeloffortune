@@ -31,21 +31,19 @@ class Board(object):
 
     @property
     def masked_phrase(self):
-        """
-        Returns a STRING masked_phrase with the same length as self.correct_phrase but with all alphabetic characters converted to *
-        """
+        """correct_phrase with unguessed letters replaced with *'s"""
         return "".join(c if (c in self.all_guesses or not c.isalpha()) else '*'
                        for c in self.correct_phrase)
 
-    def is_guess_correct(self, guess):
+    def guess(self, guess):
         """
         STRING -> (INT, BOOLEAN)
         Returns the number of characters guessed correctly and whether the game is over
 
         Changes to state:   BOARD object's all_guesses (SET)
 
-        There are 5 possible scenarios after making a guess:
-        1) You make an invalid guess (an empty guess or a guess that's already been made).  Return (-1, False)
+        There are 5 possible scenarios when making a guess:
+        1) guess is not valid (an empty guess or a guess that's already been made).  Return (-1, False)
         2) You make a valid single letter guess.  The game still has unsolved pieces.  Return ( > 0 , False)
         3) You make a valid single letter guess.  The game doesn't have any remaining unsolved pieces.  Return ( > 0, True)
         4) You make a valid single letter guess, but there are no pieces with that guess.  Return (0, False)
@@ -54,33 +52,38 @@ class Board(object):
         6) You make a valid multiple letter guess (solve), and you solved correctly.  Return (0, True)
         """
 
-        num_found = 0
-        game_over = False
-        u_guess = guess.upper()
+        def guess_is_valid(guess): return len(guess) == 0 or guess in self.all_guesses
 
-        # Scenario 1 - The game continues and the player guesses again.
-        if len(u_guess) == 0 or u_guess in self.all_guesses:
-            print "Please guess again. You didn't provide a guess or your guess has already been made."
-            num_found = -1 # need to guess again
-            return (num_found, game_over)
-        # Scenario 2, 3, and 4
-        elif len(u_guess) == 1:
-            # Scenario 2 - The game still has unsolved pieces.  The player updates his score, the game continues, and the player goes again.
+        def single_letter_guess(char):
+            initial_unguessed = self.masked_phrase.count('*')
             self.all_guesses.add(u_guess)
-            # Check if the game is over
+            num_found = initial_unguessed - self.masked_phrase.count('*')
             if self.masked_phrase == self.correct_phrase:
                 # Scenario 3 - The game doesn't have any remaining unsolved pieces.  The player updates his score, and the game ends.
-                game_over = True
-            # Scenario 4 - The game still has unsolved pieces.  The player updates his score (which is 0), the game continues, and the next player goes.
-            return (num_found, game_over) # num_found will be between 0 and some positive number
-        else:
-            # Scenario 5 and 6
+                return (num_found, True)
+            else:
+                # Scenario 2 - The game still has unsolved pieces.  The player updates his score, the game continues, and the player goes again.
+                # Scenario 4 - The game still has unsolved pieces.  The player updates his score (which is 0), the game continues, and the next player goes.
+                return (num_found, False) # num_found will be between 0 and some positive number
+
+        def phrase_guess(phrase):
             self.all_guesses.add(u_guess)
-            if u_guess == self.correct_phrase:
+            if phrase == self.correct_phrase:
                 # Scenario 6 - The player solves correctly.  The player updates his score (which is 0), and the game ends.
-                game_over = True
-            # Scenario 5 - The player solves incorrectly.  The player updates his score (which is 0), the game continues, and the next player goes.
-            return (num_found, game_over)
+                return (0, True)
+            else:
+                # Scenario 5 - The player solves incorrectly.  The player updates his score (which is 0), the game continues, and the next player goes.
+                return (0, False)
+
+        u_guess = guess.upper()
+
+        if not guess_is_valid(u_guess):
+            print "Please guess again. You didn't provide a guess or your guess has already been made."
+            return (-1, False)
+        if len(u_guess) == 1:
+            return single_letter_guess(u_guess)
+        else:
+            return phrase_guess(u_guess)
 
     @classmethod
     def add_phrase(cls, phrase):
@@ -215,7 +218,7 @@ class Game(object):
                 # You successfully spun the wheel
                 player_guess = self.prompt_guess()
                 # Submit guess to board
-                (num_found, game_over) = self.board.is_guess_correct(player_guess)
+                (num_found, game_over) = self.board.guess(player_guess)
                 # Scenario 1
                 if num_found == -1:
                     # Don't update number of guesses
