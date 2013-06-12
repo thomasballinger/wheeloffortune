@@ -9,8 +9,8 @@ class Wheel(object):
     @classmethod
     def spin(cls):
         """
-        Input:                nothing besides the CLS
-        Output:                an INT representing the value of the spin
+        Input:               nothing besides the CLS
+        Output:              an INT representing the value of the spin
         Changes to state:    N/A
         """
         rand_num = random.randint(1, 100)
@@ -22,19 +22,19 @@ class Wheel(object):
             return 1
         elif rand_num <= 88:
             return 2
-        elif rand_num    <= 94:
+        elif rand_num <= 94:
             return 3
         elif rand_num <= 99:
             return 5
         else:
             return 8
-            
+
 
 class Board(object):
     """
     Create a BOARD that has a list of all phrases PLAYERs guess from. A BOARD informs PLAYERs whether their guesses were correct or not.
     """
-    
+
     # Dummy phrases for testing
     # phrases = ['EE, AEAO! EE.', "AA'E AOE? OO AE! EO?", 'E. E. E.']
 
@@ -52,7 +52,7 @@ class Board(object):
         self.correct_phrase = random.choice(self.__class__.phrases)
         self.current_phrase = self.mask_phrase()
         self.all_guesses = set()
-    
+
     def get_correct_phrase(self):
         return self.correct_phrase
     def get_current_phrase(self):
@@ -66,9 +66,9 @@ class Board(object):
 
     def mask_phrase(self):
         """
-        Input:                 nothing besides SELF
+        Input:              nothing besides SELF
         Output:             a STRING masked_phrase with the same length as self.correct_phrase but with all alphabetic characters converted to *
-        Changes to state:     N/A
+        Changes to state:   N/A
 
         Note: This method is only used when a BOARD object is initially set up.
         """
@@ -82,9 +82,9 @@ class Board(object):
 
     def is_guess_correct(self, guess):
         """
-        Input:                 a STRING guess
+        Input:              a STRING guess
         Output:             a 2 item TUPLE(INT, BOOLEAN) where the first item indicates how many characters were guessed correctly and the second item indicates whether the game is over
-        Changes to state:    BOARD object's current_phrase (STRING), BOARD object's all_guesses (SET)
+        Changes to state:   BOARD object's current_phrase (STRING), BOARD object's all_guesses (SET)
 
         There are 5 possible scenarios after making a guess:
         1) You make an invalid guess (an empty guess or a guess that's already been made).  Return (-1, False)
@@ -95,7 +95,7 @@ class Board(object):
             * Notice that (4) and (5) return identical results.
         6) You make a valid multiple letter guess (solve), and you solved correctly.  Return (0, True)
         """
-        
+
         num_found = 0
         game_over = False
         u_guess = guess.upper()
@@ -132,7 +132,7 @@ class Board(object):
     @classmethod
     def get_phrases(cls):
         return cls.phrases
-    
+
     @classmethod
     def add_phrase(cls, phrase):
         """
@@ -153,7 +153,7 @@ class Player(object):
     """
     Create a PLAYER who can interact with a BOARD within the context of a GAME.
     """
-    
+
     def __init__(self, name, total_games_played = 0, total_games_won = 0, total_winnings = 0):
         self.name = name
         self.total_games_played = total_games_played
@@ -162,11 +162,11 @@ class Player(object):
         self.current_game = {"score": 0, "num_guesses": 0, "num_correct_guesses": 0}
         self.total_num_guesses = self.current_game["num_guesses"]
         self.total_num_correct_guesses = self.current_game["num_correct_guesses"]
-    
+
     def __str__(self):
         return "My name is %s. I have guessed %s total times and got %s guesses correctly in the %s games I played. My win-loss record is: %s Wins and %s Losses. My total winnings is %s." \
         % (self.name, self.total_num_guesses, self.total_num_correct_guesses, self.total_games_played, self.total_games_won, self.total_games_played - self.total_games_won, self.total_winnings)
-    
+
     def get_name(self):
         return self.name
     def set_name(self, name):
@@ -178,19 +178,19 @@ class Player(object):
     def inc_total_games_played(self):
         self.total_games_played += 1
         return self.total_games_played
-    
+
     def get_total_games_won(self):
         return self.total_games_won
     def inc_total_games_won(self):
         self.total_games_won += 1
         return self.total_games_won
-    
+
     def get_total_winnings(self):
         return self.total_winnings
     def update_total_winnings(self, incremental_winnings):
         self.total_winnings += incremental_winnings
         return self.total_winnings
-    
+
     def get_current_game(self):
         return self.current_game
     def get_current_game_score(self):
@@ -198,7 +198,7 @@ class Player(object):
     def update_current_game_score(self, new_inc_score):
         self.current_game["score"] += new_inc_score
         return self.current_game["score"]
-    
+
     def get_current_game_num_guesses(self):
         return self.current_game["num_guesses"]
     def inc_current_game_num_guesses(self):
@@ -233,7 +233,7 @@ class Game(object):
         self.num_players = num_players
         self.players = []
         self.board = Board()
-        
+
         for i in range(0, num_players):
             name = raw_input("Please enter your name: ")
             self.players.append(Player(name))
@@ -246,7 +246,7 @@ class Game(object):
         self.current_player = self.players[0]
         self.is_game_over = False
         self.start_game()
-        
+
     def __str__(self):
         s = """Here's a description of a game so far:\n** Game **\nThere are %s players. We are on turn %s, and here's a description of the current player:\n%s\n\n** Players **\n%s\n\n** Board **\n%s""" % (self.get_num_players(), self.get_num_turns(), self.get_current_player(), self.get_players(), self.get_board())
         return s
@@ -277,11 +277,11 @@ class Game(object):
         self.num_turns += 1
         self.current_player = self.players[self.num_turns % self.num_players]
         return self.current_player
-    
+
     def prompt_guess(self):
         guess = raw_input("Please enter a guess: ")
         # Basic Validation: Is there a way to just make sure there are no numbers? Regex?
-        
+
         # if not guess.isalpha():
         #     print "Please enter either a single alphabetic letter or an alphabetic phrase."
         #     return self.prompt_guess()
