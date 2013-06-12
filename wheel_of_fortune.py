@@ -18,11 +18,6 @@ class Board(object):
     BOARD that has a list of all phrases PLAYERs guess from. A BOARD informs PLAYERs whether their guesses were correct or not.
     """
 
-    # Dummy phrases for testing
-    # phrases = ['EE, AEAO! EE.', "AA'E AOE? OO AE! EO?", 'E. E. E.']
-
-    # UNCOMMENT BELOW WHEN IN PRODUCTION
-
     phrases =  ['SOMETIMES THE HEART SEES WHAT IS INVISIBLE TO THE EYE.',
                 'NEVER GRADUATE!',
                 "IF YOU DON'T BUILD YOUR DREAM, SOMEONE ELSE WILL HIRE YOU TO HELP THEM BUILD THEIRS.",
