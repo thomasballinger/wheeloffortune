@@ -2,18 +2,14 @@ import random
 
 class Wheel(object):
     """
-    Create a WHEEL which has different probabilities of returning different integer values.  The integer values represent the multiplier that's
-    applied to a PLAYERs score, depending on the number of characters they guessed correctly.
+    WHEEL which has different probabilities of returning different integer values.
+    The integer values represent the multiplier that's applied to a PLAYERs score,
+    depending on the number of characters they guessed correctly.
     """
 
     @classmethod
     def spin(cls):
-        """
-        Returns the value of the spin as an int
-        Input:               nothing besides the CLS
-        Output:              an INT representing the value of the spin
-        Changes to state:    N/A
-        """
+        """Returns the value of the spin as an int"""
         rand_num = random.randint(1, 100)
 
         # generate distribution
@@ -33,7 +29,7 @@ class Wheel(object):
 
 class Board(object):
     """
-    Create a BOARD that has a list of all phrases PLAYERs guess from. A BOARD informs PLAYERs whether their guesses were correct or not.
+    BOARD that has a list of all phrases PLAYERs guess from. A BOARD informs PLAYERs whether their guesses were correct or not.
     """
 
     # Dummy phrases for testing
@@ -60,9 +56,7 @@ class Board(object):
 
     def mask_phrase(self):
         """
-        Input:              nothing besides SELF
-        Output:             a STRING masked_phrase with the same length as self.correct_phrase but with all alphabetic characters converted to *
-        Changes to state:   N/A
+        Returns a STRING masked_phrase with the same length as self.correct_phrase but with all alphabetic characters converted to *
 
         Note: This method is only used when a BOARD object is initially set up.
         """
@@ -76,8 +70,9 @@ class Board(object):
 
     def is_guess_correct(self, guess):
         """
-        Input:              a STRING guess
-        Output:             a 2 item TUPLE(INT, BOOLEAN) where the first item indicates how many characters were guessed correctly and the second item indicates whether the game is over
+        STRING -> (INT, BOOLEAN)
+        Returns the number of characters guessed correctly and whether the game is over
+
         Changes to state:   BOARD object's current_phrase (STRING), BOARD object's all_guesses (SET)
 
         There are 5 possible scenarios after making a guess:
@@ -141,7 +136,7 @@ class Board(object):
 
 class Player(object):
     """
-    Create a PLAYER who can interact with a BOARD within the context of a GAME.
+    PLAYER who can interact with a BOARD within the context of a GAME.
     """
 
     def __init__(self, name, total_games_played = 0, total_games_won = 0, total_winnings = 0):
@@ -211,9 +206,7 @@ class Game(object):
 
     def advance_player(self):
         """
-        Input:                nothing besides SELF
-        Output:                a PLAYER representing the next player in the established order
-        Changes to state:    GAMEs current_player
+        Advance the player and inrement self.num_turns
 
         Note:  This method should only be called when Scenario 4 or 5 occurs.
         """
@@ -234,9 +227,7 @@ class Game(object):
 
     def start_game(self):
         """
-        Input:                nothing besides SELF
-        Output:                N/A (doesn't return anything specific)
-        Changes to state:    GAME (num_turns, board, players, current_player, is_game_over)
+        Changes to state:   GAME (num_turns, board, players, current_player, is_game_over)
                             PLAYER (total_games_played, total_games_won, total_winnings, current_game, total_num_guesses, total_num_correct_guesses,)
                             BOARD (current_phrase, all_guesses)
 
