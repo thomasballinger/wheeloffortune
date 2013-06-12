@@ -32,7 +32,7 @@ class Board(object):
         """
         A new BOARD will randomly select a phrase to start GAME.
         """
-        self.correct_phrase = random.choice(self.__class__.phrases)
+        self.correct_phrase = random.choice(self.phrases)
         self.current_phrase = self.mask_phrase()
         self.all_guesses = set()
 
