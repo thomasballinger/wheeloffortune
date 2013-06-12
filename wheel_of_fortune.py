@@ -42,13 +42,7 @@ class Board(object):
 
         Note: This method is only used when a BOARD object is initially set up.
         """
-        masked_phrase = ""
-        for letter in self.correct_phrase:
-            if letter.isalpha():
-                masked_phrase += "*"
-            else:
-                masked_phrase += letter
-        return masked_phrase
+        return "".join('*' if c.isalpha() else '*' for c in self.correct_phrase)
 
     def is_guess_correct(self, guess):
         """
@@ -108,10 +102,9 @@ class Board(object):
         Changes to state:    BOARD class' phrase (LIST)
         Note: Only add a phrase if the phrase doesn't already exist in the list.
         """
-        for i in cls.phrases:
-            if phrase.lower() == i.lower():
-                print "Phrase already exists."
-                return cls.phrases
+        if phrase.lower() in (i.lower() for i in cls.phrases):
+            print "Phrase already exists."
+            return cls.phrases
         cls.phrases.append(phrase.upper())
         return cls.phrases
     # add_phrase = classmethod(add_phrase) # The @classmethod is syntactic sugar for this function call.
