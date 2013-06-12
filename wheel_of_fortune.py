@@ -241,10 +241,10 @@ class Game(object):
             print self.board
 
             score = 0
-            spin = spin_wheel()
 
             print self.current_player.name + ", it's your turn and here's your current score: %s" % self.current_player.current_game_score
             raw_input("Press enter to see what you spin!")
+            spin = spin_wheel()
             print "You rolled a %s." % spin
 
             if spin == 0:
