@@ -5,17 +5,13 @@ def spin_wheel():
     Returns integer values representing the multiplier that's applied to a PLAYERs score,
     depending on the number of characters they guessed correctly.
     """
-    choices = ([0] * 25 +
-               [1] * 50 +
-               [2] * 13 +
-               [3] * 6 +
-               [5] * 5 +
-               [8] * 1)
+    choices = ([0] * 25 + [1] * 50 + [2] * 13 + [3] * 6 + [5] * 5 + [8] * 1)
     return random.choice(choices)
 
 class Board(object):
     """
-    BOARD that has a list of all phrases PLAYERs guess from. A BOARD informs PLAYERs whether their guesses were correct or not.
+    BOARD that has a list of all phrases PLAYERs guess from.
+    A BOARD informs PLAYERs whether their guesses were correct or not.
     """
 
     phrases =  ['SOMETIMES THE HEART SEES WHAT IS INVISIBLE TO THE EYE.',
@@ -24,32 +20,31 @@ class Board(object):
                 'DO NOT DWELL IN THE PAST, DO NOT DREAM OF THE FUTURE, CONCENTRATE THE MIND ON THE PRESENT MOMENT.']
 
     def __init__(self):
-        """
-        A new BOARD will randomly select a phrase to start GAME.
-        """
+        """A new BOARD will randomly select a phrase to start GAME."""
         self.correct_phrase = random.choice(self.phrases)
-        self.current_phrase = self.mask_phrase()
         self.all_guesses = set()
 
     def __str__(self):
         s = ("""Here is what the board looks like so far: %s\nHere are all the guesses so far: %s"""
-                % (self.current_phrase, str(self.all_guesses)))
+                % (self.masked_phrase, str(self.all_guesses)))
         return s
 
-    def mask_phrase(self):
+    @property
+    def masked_phrase(self):
         """
         Returns a STRING masked_phrase with the same length as self.correct_phrase but with all alphabetic characters converted to *
 
         Note: This method is only used when a BOARD object is initially set up.
         """
-        return "".join('*' if c.isalpha() else c for c in self.correct_phrase)
+        return "".join(c if (c in self.all_guesses or not c.isalpha()) else '*'
+                       for c in self.correct_phrase)
 
     def is_guess_correct(self, guess):
         """
         STRING -> (INT, BOOLEAN)
         Returns the number of characters guessed correctly and whether the game is over
 
-        Changes to state:   BOARD object's current_phrase (STRING), BOARD object's all_guesses (SET)
+        Changes to state:   BOARD object's all_guesses (SET)
 
         There are 5 possible scenarios after making a guess:
         1) You make an invalid guess (an empty guess or a guess that's already been made).  Return (-1, False)
@@ -72,14 +67,10 @@ class Board(object):
             return (num_found, game_over)
         # Scenario 2, 3, and 4
         elif len(u_guess) == 1:
+            # Scenario 2 - The game still has unsolved pieces.  The player updates his score, the game continues, and the player goes again.
             self.all_guesses.add(u_guess)
-            for (index, letter) in enumerate(self.correct_phrase):
-                if u_guess == letter:
-                    # Scenario 2 - The game still has unsolved pieces.  The player updates his score, the game continues, and the player goes again.
-                    num_found += 1
-                    self.current_phrase = self.current_phrase[:index] + u_guess + self.current_phrase[index + 1:]
             # Check if the game is over
-            if self.current_phrase == self.correct_phrase:
+            if self.masked_phrase == self.correct_phrase:
                 # Scenario 3 - The game doesn't have any remaining unsolved pieces.  The player updates his score, and the game ends.
                 game_over = True
             # Scenario 4 - The game still has unsolved pieces.  The player updates his score (which is 0), the game continues, and the next player goes.
@@ -90,7 +81,6 @@ class Board(object):
             if u_guess == self.correct_phrase:
                 # Scenario 6 - The player solves correctly.  The player updates his score (which is 0), and the game ends.
                 game_over = True
-                self.current_phrase = self.correct_phrase
             # Scenario 5 - The player solves incorrectly.  The player updates his score (which is 0), the game continues, and the next player goes.
             return (num_found, game_over)
 
@@ -197,7 +187,7 @@ class Game(object):
         """
         Changes to state:   GAME (num_turns, board, players, current_player, is_game_over)
                             PLAYER (total_games_played, total_games_won, total_winnings, current_game, total_num_guesses, total_num_correct_guesses,)
-                            BOARD (current_phrase, all_guesses)
+                            BOARD (all_guesses)
 
         Note:  This method should only be run at the end of the __init__ method.  This method establishes the game loop and will keep on
         looping until the is_game_over counter is set to TRUE.  This can only happen if scenario 3 or 6 occurs.
