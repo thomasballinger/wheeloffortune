@@ -88,9 +88,9 @@ class Board(object):
     @classmethod
     def add_phrase(cls, phrase):
         """
-        Input:                 a STRING phrase which can be in any case
+        Input:              a STRING phrase which can be in any case
         Output:             a LIST of all the uppercased phrases all BOARDs share
-        Changes to state:    BOARD class' phrase (LIST)
+        Changes to state:   BOARD class' phrase (LIST)
         Note: Only add a phrase if the phrase doesn't already exist in the list.
         """
         if phrase.lower() in (i.lower() for i in cls.phrases):
